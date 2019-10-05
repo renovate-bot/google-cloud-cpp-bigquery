@@ -14,7 +14,7 @@ namespace internal {
 class ConnectionImpl : public Connection {
  public:
   google::cloud::StatusOr<std::string> CreateSession(
-      std::string table) override;
+      std::string parent_project_id, std::string table) override;
 
  private:
   friend std::shared_ptr<ConnectionImpl> MakeConnection(

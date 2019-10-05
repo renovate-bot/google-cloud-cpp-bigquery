@@ -10,7 +10,7 @@ class Connection {
   virtual ~Connection() = default;
 
   virtual google::cloud::StatusOr<std::string> CreateSession(
-      std::string table) = 0;
+      std::string parent_project_id, std::string table) = 0;
 };
 
 }  // namespace BIGQUERY_CLIENT_NS

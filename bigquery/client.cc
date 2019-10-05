@@ -8,13 +8,14 @@ namespace bigquery {
 inline namespace BIGQUERY_CLIENT_NS {
 using ::google::cloud::StatusOr;
 
-StatusOr<std::string> Client::CreateSession(std::string table) {
-  return conn_->CreateSession(table);
+StatusOr<std::string> Client::CreateSession(std::string parent_project_id,
+                                            std::string table) {
+  return conn_->CreateSession(parent_project_id, table);
 }
 
 std::shared_ptr<Connection> MakeConnection() {
   std::shared_ptr<internal::BigQueryReadStub> stub =
-    internal::MakeDefaultBigQueryReadStub();
+      internal::MakeDefaultBigQueryReadStub();
   return internal::MakeConnection(std::move(stub));
 }
 

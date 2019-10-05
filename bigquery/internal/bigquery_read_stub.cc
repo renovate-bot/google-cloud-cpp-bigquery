@@ -6,6 +6,7 @@
 
 #include "bigquery/connection.h"
 #include "bigquery/internal/bigquery_read_stub.h"
+#include "google/cloud/grpc_utils/grpc_error_delegate.h"
 #include "google/cloud/status_or.h"
 
 namespace bigquery {
@@ -19,6 +20,7 @@ namespace bigquerystorage_proto = ::google::cloud::bigquery::storage::v1beta1;
 using ::google::cloud::Status;
 using ::google::cloud::StatusCode;
 using ::google::cloud::StatusOr;
+using ::google::cloud::grpc_utils::MakeStatusFromRpcError;
 
 class DefaultBigQueryReadStub : public BigQueryReadStub {
  public:
@@ -38,8 +40,14 @@ class DefaultBigQueryReadStub : public BigQueryReadStub {
 google::cloud::StatusOr<bigquerystorage_proto::ReadSession>
 DefaultBigQueryReadStub::CreateReadSession(
     bigquerystorage_proto::CreateReadSessionRequest const& request) {
-  return Status(StatusCode::kUnimplemented,
-                "This function has not been implemented yet.");
+  bigquerystorage_proto::ReadSession response;
+  grpc::ClientContext client_context;
+  grpc::Status grpc_status =
+      grpc_stub_->CreateReadSession(&client_context, request, &response);
+  if (!grpc_status.ok()) {
+    return MakeStatusFromRpcError(grpc_status);
+  }
+  return response;
 }
 
 }  // namespace
@@ -50,7 +58,8 @@ std::shared_ptr<BigQueryReadStub> MakeDefaultBigQueryReadStub() {
 
   auto grpc_stub =
       bigquerystorage_proto::BigQueryStorage::NewStub(grpc::CreateCustomChannel(
-          "", grpc::GoogleDefaultCredentials(), channel_arguments));
+          "bigquerystorage.googleapis.com", grpc::GoogleDefaultCredentials(),
+          channel_arguments));
 
   return std::make_shared<DefaultBigQueryReadStub>(std::move(grpc_stub));
 }

@@ -26,7 +26,8 @@ class Client {
 
   friend bool operator!=(Client const& a, Client const& b) { return !(a == b); }
 
-  google::cloud::StatusOr<std::string> CreateSession(std::string table);
+  google::cloud::StatusOr<std::string> CreateSession(
+      std::string parent_project_id, std::string table);
 
  private:
   std::shared_ptr<Connection> conn_;

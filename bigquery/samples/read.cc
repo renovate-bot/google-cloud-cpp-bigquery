@@ -2,7 +2,8 @@
 
 int main(int argc, char* argv[]) {
   bigquery::Client client(bigquery::MakeConnection());
-  google::cloud::StatusOr<std::string> res = client.CreateSession("my-table");
+  google::cloud::StatusOr<std::string> res = client.CreateSession(
+      "aryann-bigquery", "bigquery-public-data:samples.shakespeare");
 
   if (res.ok()) {
     std::cout << "Session name: " << res.value();
