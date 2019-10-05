@@ -3,12 +3,11 @@
 
 #include <memory>
 
+#include "bigquery/connection.h"
 #include "google/cloud/status_or.h"
 
 namespace bigquery {
 inline namespace BIGQUERY_CLIENT_NS {
-class Connection;
-
 class Client {
  public:
   explicit Client(std::shared_ptr<Connection> conn) : conn_(std::move(conn)) {}
@@ -32,6 +31,8 @@ class Client {
  private:
   std::shared_ptr<Connection> conn_;
 };
+
+std::shared_ptr<Connection> MakeConnection();
 
 }  // namespace BIGQUERY_CLIENT_NS
 }  // namespace bigquery
