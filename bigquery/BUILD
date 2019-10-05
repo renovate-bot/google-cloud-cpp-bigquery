@@ -13,6 +13,7 @@ cc_library(
     ],
     deps = [
         "@com_github_googleapis_google_cloud_cpp//google/cloud:google_cloud_cpp_common",
+	"@com_google_googleapis//:bigquery_protos",
     ],
 
 )
