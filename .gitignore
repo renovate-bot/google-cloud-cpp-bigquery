@@ -1,32 +1,17 @@
-# Prerequisites
-*.d
+# Common bazel output directories
+bazel-*
+!bazel-*.cfg
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# Backup files for Emacs
+*~
 
-# Precompiled Headers
-*.gch
-*.pch
+# Ignore IDEA / IntelliJ files
+.idea/
+cmake-build-*/
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# Ignore Visual Studio code directories.
+.vsbuild/
+.vscode/
 
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+# Ignore Visual Studio Code files.
+.vscode/
