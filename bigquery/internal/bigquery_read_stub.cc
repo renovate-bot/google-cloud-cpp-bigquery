@@ -15,6 +15,8 @@ namespace internal {
 
 namespace {
 
+constexpr auto kRoutingHeader = "x-goog-request-params";
+
 namespace bigquerystorage_proto = ::google::cloud::bigquery::storage::v1beta1;
 
 using ::google::cloud::Status;
@@ -42,6 +44,22 @@ DefaultBigQueryReadStub::CreateReadSession(
     bigquerystorage_proto::CreateReadSessionRequest const& request) {
   bigquerystorage_proto::ReadSession response;
   grpc::ClientContext client_context;
+
+  // For performance reasons, the Google routing layer does not parse
+  // request messages. As such, we must hoist the values required for
+  // routing into a header.
+  //
+  // TODO(aryann): Replace the below string concatenations with
+  // absl::Substitute.
+  //
+  // TODO(aryann): URL escape the project ID and dataset ID before
+  // placing them into the routing header.
+  std::string routing_header = "table_reference.project_id=";
+  routing_header += request.table_reference().project_id();
+  routing_header += "&table_reference.dataset_id=";
+  routing_header += request.table_reference().dataset_id();
+  client_context.AddMetadata(kRoutingHeader, routing_header);
+
   grpc::Status grpc_status =
       grpc_stub_->CreateReadSession(&client_context, request, &response);
   if (!grpc_status.ok()) {
