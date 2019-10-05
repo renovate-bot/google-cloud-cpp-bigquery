@@ -59,7 +59,7 @@ StatusOr<std::string> ConnectionImpl::CreateSession(
   std::string table_id = parts[1];
 
   bigquerystorage_proto::CreateReadSessionRequest request;
-  request.set_parent(parent_project_id);
+  request.set_parent("projects/" + parent_project_id);
   request.mutable_table_reference()->set_project_id(project_id);
   request.mutable_table_reference()->set_dataset_id(dataset_id);
   request.mutable_table_reference()->set_table_id(table_id);
