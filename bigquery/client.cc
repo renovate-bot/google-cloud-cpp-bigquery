@@ -13,7 +13,8 @@ StatusOr<std::string> Client::CreateSession(std::string table) {
 }
 
 std::shared_ptr<Connection> MakeConnection() {
-  return internal::MakeConnection();
+  std::shared_ptr<internal::BigQueryReadStub> stub;
+  return internal::MakeConnection(std::move(stub));
 }
 
 }  // namespace BIGQUERY_CLIENT_NS

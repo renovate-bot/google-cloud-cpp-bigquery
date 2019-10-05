@@ -8,8 +8,10 @@ cc_library(
     ],
     srcs = [
       "client.cc",
-      "internal/connection_impl.h",
+      "internal/bigquery_read_stub.cc",
+      "internal/bigquery_read_stub.h",
       "internal/connection_impl.cc",
+      "internal/connection_impl.h",
     ],
     deps = [
         "@com_github_googleapis_google_cloud_cpp//google/cloud:google_cloud_cpp_common",
