@@ -6,7 +6,7 @@ int main(int argc, char* argv[]) {
       "aryann-bigquery", "bigquery-public-data:samples.shakespeare");
 
   if (res.ok()) {
-    std::cout << "Session name: " << res.value();
+    std::cout << "Session name: " << res.value() << "\n";
     return EXIT_SUCCESS;
   } else {
     std::cerr << "Session creation failed with error: " << res.status() << "\n";
