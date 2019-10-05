@@ -7,7 +7,6 @@
 
 namespace bigquery {
 inline namespace BIGQUERY_CLIENT_NS {
-
 class Connection;
 
 class Client {
@@ -26,9 +25,7 @@ class Client {
     return a.conn_ == b.conn_;
   }
 
-  friend bool operator!=(Client const& a, Client const& b) {
-    return !(a == b);
-  }
+  friend bool operator!=(Client const& a, Client const& b) { return !(a == b); }
 
   google::cloud::StatusOr<std::string> CreateSession(std::string table);
 
