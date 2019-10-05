@@ -13,7 +13,8 @@ StatusOr<std::string> Client::CreateSession(std::string table) {
 }
 
 std::shared_ptr<Connection> MakeConnection() {
-  std::shared_ptr<internal::BigQueryReadStub> stub;
+  std::shared_ptr<internal::BigQueryReadStub> stub =
+    internal::MakeDefaultBigQueryReadStub();
   return internal::MakeConnection(std::move(stub));
 }
 
