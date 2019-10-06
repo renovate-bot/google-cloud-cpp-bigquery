@@ -12,11 +12,11 @@ namespace bigquery {
 inline namespace BIGQUERY_CLIENT_NS {
 namespace internal {
 
-// BigQueryReadStub is a thin stub layer over the BigQuery Storage API
+// BigQueryStorageStub is a thin stub layer over the BigQuery Storage API
 // that hides the underlying transport stub, i.e., gRPC.
-class BigQueryReadStub {
+class BigQueryStorageStub {
  public:
-  virtual ~BigQueryReadStub() = default;
+  virtual ~BigQueryStorageStub() = default;
 
   // Sends a CreateReadSession RPC.
   virtual google::cloud::StatusOr<
@@ -26,10 +26,10 @@ class BigQueryReadStub {
           request) = 0;
 
  protected:
-  BigQueryReadStub() = default;
+  BigQueryStorageStub() = default;
 };
 
-std::shared_ptr<BigQueryReadStub> MakeDefaultBigQueryReadStub(
+std::shared_ptr<BigQueryStorageStub> MakeDefaultBigQueryStorageStub(
     ConnectionOptions const& options);
 
 }  // namespace internal

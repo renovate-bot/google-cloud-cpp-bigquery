@@ -15,8 +15,8 @@ StatusOr<std::string> Client::CreateSession(std::string parent_project_id,
 }
 
 std::shared_ptr<Connection> MakeConnection(ConnectionOptions const& options) {
-  std::shared_ptr<internal::BigQueryReadStub> stub =
-      internal::MakeDefaultBigQueryReadStub(options);
+  std::shared_ptr<internal::BigQueryStorageStub> stub =
+      internal::MakeDefaultBigQueryStorageStub(options);
   return internal::MakeConnection(std::move(stub));
 }
 

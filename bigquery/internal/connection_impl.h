@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "bigquery/connection.h"
-#include "bigquery/internal/bigquery_read_stub.h"
+#include "bigquery/internal/bigquerystorage_stub.h"
 #include "google/cloud/status_or.h"
 
 namespace bigquery {
@@ -22,14 +22,14 @@ class ConnectionImpl : public Connection {
 
  private:
   friend std::shared_ptr<ConnectionImpl> MakeConnection(
-      std::shared_ptr<BigQueryReadStub> read_stub);
-  ConnectionImpl(std::shared_ptr<BigQueryReadStub> read_stub);
+      std::shared_ptr<BigQueryStorageStub> read_stub);
+  ConnectionImpl(std::shared_ptr<BigQueryStorageStub> read_stub);
 
-  std::shared_ptr<BigQueryReadStub> read_stub_;
+  std::shared_ptr<BigQueryStorageStub> read_stub_;
 };
 
 std::shared_ptr<ConnectionImpl> MakeConnection(
-    std::shared_ptr<BigQueryReadStub> read_stub);
+    std::shared_ptr<BigQueryStorageStub> read_stub);
 
 }  // namespace internal
 }  // namespace BIGQUERY_CLIENT_NS

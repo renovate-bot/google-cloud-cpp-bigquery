@@ -6,7 +6,7 @@
 
 #include "bigquery/connection.h"
 #include "bigquery/connection_options.h"
-#include "bigquery/internal/bigquery_read_stub.h"
+#include "bigquery/internal/bigquerystorage_stub.h"
 #include "google/cloud/grpc_utils/grpc_error_delegate.h"
 #include "google/cloud/status_or.h"
 
@@ -25,9 +25,9 @@ using ::google::cloud::StatusCode;
 using ::google::cloud::StatusOr;
 using ::google::cloud::grpc_utils::MakeStatusFromRpcError;
 
-class DefaultBigQueryReadStub : public BigQueryReadStub {
+class DefaultBigQueryStorageStub : public BigQueryStorageStub {
  public:
-  explicit DefaultBigQueryReadStub(
+  explicit DefaultBigQueryStorageStub(
       std::unique_ptr<bigquerystorage_proto::BigQueryStorage::StubInterface>
           grpc_stub)
       : grpc_stub_(std::move(grpc_stub)) {}
@@ -41,7 +41,7 @@ class DefaultBigQueryReadStub : public BigQueryReadStub {
 };
 
 google::cloud::StatusOr<bigquerystorage_proto::ReadSession>
-DefaultBigQueryReadStub::CreateReadSession(
+DefaultBigQueryStorageStub::CreateReadSession(
     bigquerystorage_proto::CreateReadSessionRequest const& request) {
   bigquerystorage_proto::ReadSession response;
   grpc::ClientContext client_context;
@@ -71,14 +71,14 @@ DefaultBigQueryReadStub::CreateReadSession(
 
 }  // namespace
 
-std::shared_ptr<BigQueryReadStub> MakeDefaultBigQueryReadStub(
+std::shared_ptr<BigQueryStorageStub> MakeDefaultBigQueryStorageStub(
     ConnectionOptions const& options) {
   auto grpc_stub =
       bigquerystorage_proto::BigQueryStorage::NewStub(grpc::CreateCustomChannel(
           options.bigquerystorage_endpoint(), options.credentials(),
           options.CreateChannelArguments()));
 
-  return std::make_shared<DefaultBigQueryReadStub>(std::move(grpc_stub));
+  return std::make_shared<DefaultBigQueryStorageStub>(std::move(grpc_stub));
 }
 
 }  // namespace internal

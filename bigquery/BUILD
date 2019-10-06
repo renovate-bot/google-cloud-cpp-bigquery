@@ -12,8 +12,8 @@ cc_library(
     srcs = [
       "client.cc",
       "connection_options.cc",
-      "internal/bigquery_read_stub.cc",
-      "internal/bigquery_read_stub.h",
+      "internal/bigquerystorage_stub.cc",
+      "internal/bigquerystorage_stub.h",
       "internal/connection_impl.cc",
       "internal/connection_impl.h",
     ],

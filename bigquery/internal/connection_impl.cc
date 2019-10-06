@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#include "bigquery/internal/bigquery_read_stub.h"
+#include "bigquery/internal/bigquerystorage_stub.h"
 #include "bigquery/internal/connection_impl.h"
 #include "google/cloud/status_or.h"
 
@@ -37,7 +37,7 @@ std::istream& operator>>(std::istream& is, DelimitedBy<delimiter>& output) {
 }
 }  // namespace
 
-ConnectionImpl::ConnectionImpl(std::shared_ptr<BigQueryReadStub> read_stub)
+ConnectionImpl::ConnectionImpl(std::shared_ptr<BigQueryStorageStub> read_stub)
     : read_stub_(read_stub) {}
 
 StatusOr<std::string> ConnectionImpl::CreateSession(
@@ -71,7 +71,7 @@ StatusOr<std::string> ConnectionImpl::CreateSession(
 }
 
 std::shared_ptr<ConnectionImpl> MakeConnection(
-    std::shared_ptr<BigQueryReadStub> read_stub) {
+    std::shared_ptr<BigQueryStorageStub> read_stub) {
   return std::shared_ptr<ConnectionImpl>(
       new ConnectionImpl(std::move(read_stub)));
 }
