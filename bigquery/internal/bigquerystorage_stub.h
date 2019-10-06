@@ -6,6 +6,7 @@
 
 #include "bigquery/connection.h"
 #include "bigquery/connection_options.h"
+#include "bigquery/internal/stream_reader.h"
 #include "bigquery/version.h"
 #include "google/cloud/status_or.h"
 
@@ -14,7 +15,7 @@ inline namespace BIGQUERY_CLIENT_NS {
 namespace internal {
 
 // BigQueryStorageStub is a thin stub layer over the BigQuery Storage API
-// that hides the underlying transport stub, i.e., gRPC.
+// that hides the underlying transport stub, e.g., gRPC.
 class BigQueryStorageStub {
  public:
   virtual ~BigQueryStorageStub() = default;
@@ -25,6 +26,11 @@ class BigQueryStorageStub {
   CreateReadSession(
       google::cloud::bigquery::storage::v1beta1::CreateReadSessionRequest const&
           request) = 0;
+
+  virtual std::unique_ptr<
+      StreamReader<google::cloud::bigquery::storage::v1beta1::ReadRowsResponse>>
+  ReadRows(google::cloud::bigquery::storage::v1beta1::ReadRowsRequest const&
+               request) = 0;
 
  protected:
   BigQueryStorageStub() = default;

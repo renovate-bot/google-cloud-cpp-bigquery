@@ -7,8 +7,10 @@
 #include "bigquery/connection.h"
 #include "bigquery/connection_options.h"
 #include "bigquery/internal/bigquerystorage_stub.h"
+#include "bigquery/internal/stream_reader.h"
 #include "bigquery/version.h"
 #include "google/cloud/grpc_utils/grpc_error_delegate.h"
+#include "google/cloud/optional.h"
 #include "google/cloud/status_or.h"
 
 namespace bigquery {
@@ -21,10 +23,36 @@ constexpr auto kRoutingHeader = "x-goog-request-params";
 
 namespace bigquerystorage_proto = ::google::cloud::bigquery::storage::v1beta1;
 
+using ::google::cloud::optional;
 using ::google::cloud::Status;
 using ::google::cloud::StatusCode;
 using ::google::cloud::StatusOr;
 using ::google::cloud::grpc_utils::MakeStatusFromRpcError;
+
+// An implementation of StreamReader for gRPC unary-streaming methods.
+template <class T>
+class gRPCStreamReader : public StreamReader<T> {
+ public:
+  gRPCStreamReader(std::unique_ptr<grpc::ClientContext> context,
+                   std::unique_ptr<grpc::ClientReaderInterface<T>> reader)
+      : context_(std::move(context)), reader_(std::move(reader)) {}
+
+  StatusOr<optional<T>> NextValue() override {
+    T t;
+    if (reader_->Read(&t)) {
+      return optional<T>(t);
+    }
+    grpc::Status grpc_status = reader_->Finish();
+    if (!grpc_status.ok()) {
+      return MakeStatusFromRpcError(grpc_status);
+    }
+    return optional<T>();
+  }
+
+ private:
+  std::unique_ptr<grpc::ClientContext> context_;
+  std::unique_ptr<grpc::ClientReaderInterface<T>> reader_;
+};
 
 class DefaultBigQueryStorageStub : public BigQueryStorageStub {
  public:
@@ -35,6 +63,9 @@ class DefaultBigQueryStorageStub : public BigQueryStorageStub {
 
   google::cloud::StatusOr<bigquerystorage_proto::ReadSession> CreateReadSession(
       bigquerystorage_proto::CreateReadSessionRequest const& request) override;
+
+  std::unique_ptr<StreamReader<bigquerystorage_proto::ReadRowsResponse>>
+  ReadRows(bigquerystorage_proto::ReadRowsRequest const& request) override;
 
  private:
   std::unique_ptr<bigquerystorage_proto::BigQueryStorage::StubInterface>
@@ -68,6 +99,29 @@ DefaultBigQueryStorageStub::CreateReadSession(
     return MakeStatusFromRpcError(grpc_status);
   }
   return response;
+}
+
+std::unique_ptr<StreamReader<bigquerystorage_proto::ReadRowsResponse>>
+DefaultBigQueryStorageStub::ReadRows(
+    bigquerystorage_proto::ReadRowsRequest const& request) {
+  // TODO(aryann): Replace this with `absl::make_unique`.
+  auto client_context =
+      std::unique_ptr<grpc::ClientContext>(new grpc::ClientContext);
+
+  // TODO(aryann): Replace the below string concatenations with
+  // absl::Substitute.
+  //
+  // TODO(aryann): URL escape the project ID and dataset ID before
+  // placing them into the routing header.
+  std::string routing_header = "read_position.stream.name=";
+  routing_header += request.read_position().stream().name();
+  client_context->AddMetadata(kRoutingHeader, routing_header);
+
+  auto stream = grpc_stub_->ReadRows(client_context.get(), request);
+  // TODO(aryann): Replace this with `absl::make_unique`.
+  return std::unique_ptr<StreamReader<bigquerystorage_proto::ReadRowsResponse>>(
+      new gRPCStreamReader<bigquerystorage_proto::ReadRowsResponse>(
+          std::move(client_context), std::move(stream)));
 }
 
 }  // namespace
