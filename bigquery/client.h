@@ -28,6 +28,10 @@ class Client {
 
   friend bool operator!=(Client const& a, Client const& b) { return !(a == b); }
 
+  // Creates a new read session and returns its name if successful.
+  //
+  // This function is just a proof of concept to ensure we can send
+  // requests to the server.
   google::cloud::StatusOr<std::string> CreateSession(
       std::string parent_project_id, std::string table);
 
