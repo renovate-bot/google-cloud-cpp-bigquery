@@ -1,6 +1,7 @@
 #ifndef BIGQUERY_CONNECTION_H_
 #define BIGQUERY_CONNECTION_H_
 
+#include "bigquery/version.h"
 #include "google/cloud/status_or.h"
 
 namespace bigquery {

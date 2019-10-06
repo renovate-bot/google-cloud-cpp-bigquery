@@ -4,6 +4,7 @@
 #include "bigquery/connection.h"
 #include "bigquery/connection_options.h"
 #include "bigquery/internal/connection_impl.h"
+#include "bigquery/version.h"
 
 namespace bigquery {
 inline namespace BIGQUERY_CLIENT_NS {

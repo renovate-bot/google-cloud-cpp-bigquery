@@ -16,6 +16,7 @@ cc_library(
       "internal/bigquerystorage_stub.h",
       "internal/connection_impl.cc",
       "internal/connection_impl.h",
+      "version.cc",
     ],
     deps = [
         "@com_github_googleapis_google_cloud_cpp//google/cloud:google_cloud_cpp_common",

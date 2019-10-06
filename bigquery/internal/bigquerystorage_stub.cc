@@ -7,6 +7,7 @@
 #include "bigquery/connection.h"
 #include "bigquery/connection_options.h"
 #include "bigquery/internal/bigquerystorage_stub.h"
+#include "bigquery/version.h"
 #include "google/cloud/grpc_utils/grpc_error_delegate.h"
 #include "google/cloud/status_or.h"
 

@@ -7,7 +7,7 @@
 #include "bigquery/version_info.h"
 #include "google/cloud/version.h"
 
-#define BIGUQERY_CLIENT_NS                              \
+#define BIGQUERY_CLIENT_NS                              \
   GOOGLE_CLOUD_CPP_VEVAL(BIGQUERY_CLIENT_VERSION_MAJOR, \
                          BIGQUERY_CLIENT_VERSION_MINOR)
 
@@ -21,7 +21,7 @@ namespace bigquery {
 // applications can use `bigquery::Foo` in their source, but the
 // symbols are versioned, e.g., the symbol becomes
 // `bigquery::v1::Foo`.
-inline namespace BIGUQERY_CLIENT_NS {
+inline namespace BIGQUERY_CLIENT_NS {
 int constexpr VersionMajor() { return BIGQUERY_CLIENT_VERSION_MAJOR; }
 int constexpr VersionMinor() { return BIGQUERY_CLIENT_VERSION_MINOR; }
 int constexpr VersionPatch() { return BIGQUERY_CLIENT_VERSION_PATCH; }
@@ -33,17 +33,9 @@ int constexpr Version() {
 }
 
 // Returns the version as a string in the form `MAJOR.MINOR.PATCH`.
-std::string VersionString() {
-  static std::string const kVersion = []() {
-    std::ostringstream os;
-    os << "v" << VersionMajor() << "." << VersionMinor() << "."
-       << VersionPatch();
-    return os.str();
-  }();
-  return kVersion;
-}
+std::string VersionString();
 
-}  // namespace BIGUQERY_CLIENT_NS
+}  // namespace BIGQUERY_CLIENT_NS
 }  // namespace bigquery
 
 #endif  // BIGQUERY_VERSION_H_

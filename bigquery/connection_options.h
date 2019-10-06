@@ -5,6 +5,8 @@
 #include <memory>
 #include <string>
 
+#include "bigquery/version.h"
+
 namespace bigquery {
 inline namespace BIGQUERY_CLIENT_NS {
 class ConnectionOptions {

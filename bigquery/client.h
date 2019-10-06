@@ -5,6 +5,7 @@
 
 #include "bigquery/connection.h"
 #include "bigquery/connection_options.h"
+#include "bigquery/version.h"
 #include "google/cloud/status_or.h"
 
 namespace bigquery {
