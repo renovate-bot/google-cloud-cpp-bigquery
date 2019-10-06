@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "bigquery/connection.h"
+#include "bigquery/connection_options.h"
 #include "google/cloud/status_or.h"
 
 namespace bigquery {
@@ -33,7 +34,7 @@ class Client {
   std::shared_ptr<Connection> conn_;
 };
 
-std::shared_ptr<Connection> MakeConnection();
+std::shared_ptr<Connection> MakeConnection(ConnectionOptions const& options);
 
 }  // namespace BIGQUERY_CLIENT_NS
 }  // namespace bigquery

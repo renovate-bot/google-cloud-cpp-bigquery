@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "bigquery/connection.h"
+#include "bigquery/connection_options.h"
 #include "google/cloud/status_or.h"
 
 namespace bigquery {
@@ -27,7 +28,8 @@ class BigQueryReadStub {
   BigQueryReadStub() = default;
 };
 
-std::shared_ptr<BigQueryReadStub> MakeDefaultBigQueryReadStub();
+std::shared_ptr<BigQueryReadStub> MakeDefaultBigQueryReadStub(
+    ConnectionOptions const& options);
 
 }  // namespace internal
 }  // namespace BIGQUERY_CLIENT_NS

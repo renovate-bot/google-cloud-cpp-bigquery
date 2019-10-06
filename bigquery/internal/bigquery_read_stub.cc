@@ -5,6 +5,7 @@
 #include <grpcpp/create_channel.h>
 
 #include "bigquery/connection.h"
+#include "bigquery/connection_options.h"
 #include "bigquery/internal/bigquery_read_stub.h"
 #include "google/cloud/grpc_utils/grpc_error_delegate.h"
 #include "google/cloud/status_or.h"
@@ -70,14 +71,12 @@ DefaultBigQueryReadStub::CreateReadSession(
 
 }  // namespace
 
-std::shared_ptr<BigQueryReadStub> MakeDefaultBigQueryReadStub() {
-  // TODO(aryann): Create a ChannelOptions class.
-  grpc::ChannelArguments channel_arguments;
-
+std::shared_ptr<BigQueryReadStub> MakeDefaultBigQueryReadStub(
+    ConnectionOptions const& options) {
   auto grpc_stub =
       bigquerystorage_proto::BigQueryStorage::NewStub(grpc::CreateCustomChannel(
-          "bigquerystorage.googleapis.com", grpc::GoogleDefaultCredentials(),
-          channel_arguments));
+          options.bigquerystorage_endpoint(), options.credentials(),
+          options.CreateChannelArguments()));
 
   return std::make_shared<DefaultBigQueryReadStub>(std::move(grpc_stub));
 }

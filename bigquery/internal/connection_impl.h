@@ -11,6 +11,10 @@ namespace bigquery {
 inline namespace BIGQUERY_CLIENT_NS {
 namespace internal {
 
+// An implementation of the Connection interface that sents requests
+// to a read stub. This class acts as the point of entry for all
+// client operations. This class should never contain
+// transport-related logic (e.g., any gRPC-specific code).
 class ConnectionImpl : public Connection {
  public:
   google::cloud::StatusOr<std::string> CreateSession(

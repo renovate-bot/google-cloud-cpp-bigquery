@@ -5,9 +5,11 @@ cc_library(
     hdrs = [
       "client.h",
       "connection.h",
+      "connection_options.h",
     ],
     srcs = [
       "client.cc",
+      "connection_options.cc",
       "internal/bigquery_read_stub.cc",
       "internal/bigquery_read_stub.h",
       "internal/connection_impl.cc",

@@ -2,6 +2,7 @@
 
 #include "bigquery/client.h"
 #include "bigquery/connection.h"
+#include "bigquery/connection_options.h"
 #include "bigquery/internal/connection_impl.h"
 
 namespace bigquery {
@@ -13,9 +14,9 @@ StatusOr<std::string> Client::CreateSession(std::string parent_project_id,
   return conn_->CreateSession(parent_project_id, table);
 }
 
-std::shared_ptr<Connection> MakeConnection() {
+std::shared_ptr<Connection> MakeConnection(ConnectionOptions const& options) {
   std::shared_ptr<internal::BigQueryReadStub> stub =
-      internal::MakeDefaultBigQueryReadStub();
+      internal::MakeDefaultBigQueryReadStub(options);
   return internal::MakeConnection(std::move(stub));
 }
 
