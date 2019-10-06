@@ -6,6 +6,8 @@ cc_library(
       "client.h",
       "connection.h",
       "connection_options.h",
+      "version.h",
+      "version_info.h",
     ],
     srcs = [
       "client.cc",

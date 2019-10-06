@@ -1,14 +1,16 @@
-#include <memory>
-
 #include <grpcpp/grpcpp.h>
+#include <memory>
+#include <string>
+
 #include "bigquery/connection_options.h"
+#include "bigquery/version.h"
 
 namespace bigquery {
 inline namespace BIGQUERY_CLIENT_NS {
 namespace internal {
 std::string BaseUserAgentPrefix() {
   // TODO(aryann): Add more info here.
-  return "aryann-cpp-bigquery/0.0.1";
+  return "aryann-cpp-bigquery/" + VersionString();
 }
 }  // namespace internal
 
