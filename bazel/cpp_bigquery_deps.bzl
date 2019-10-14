@@ -29,11 +29,11 @@ def cpp_bigquery_deps():
     if "com_github_googleapis_google_cloud_cpp" not in native.existing_rules():
         http_archive(
             name = "com_github_googleapis_google_cloud_cpp",
-            strip_prefix = "google-cloud-cpp-0.13.0",
+            strip_prefix = "google-cloud-cpp-0.14.0",
             urls = [
-                "https://github.com/googleapis/google-cloud-cpp/archive/v0.13.0.tar.gz",
+                "https://github.com/googleapis/google-cloud-cpp/archive/v0.14.0.tar.gz",
             ],
-            sha256 = "35058ff14e4f9f49f78da2f1bbf1c03f27e8e40ec65c51f62720346e99803392",
+            sha256 = "295754023a44eb69d0ff5ee2c0ac11ff1b7adcd617f122d57fc7a5a49fac612d",
         )
 
     # Load a newer version of google test than what gRPC does.
