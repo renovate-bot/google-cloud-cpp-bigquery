@@ -19,8 +19,10 @@
 #include <memory>
 #include <string>
 
-#include "bigquery/version.h"
+#include "google/cloud/bigquery/version.h"
 
+namespace google {
+namespace cloud {
 namespace bigquery {
 inline namespace BIGQUERY_CLIENT_NS {
 class ConnectionOptions {
@@ -68,5 +70,7 @@ class ConnectionOptions {
 
 }  // namespace BIGQUERY_CLIENT_NS
 }  // namespace bigquery
+}  // namespace cloud
+}  // namespace google
 
 #endif  // BIGQUERY_CONNECTION_OPTIONS_H_

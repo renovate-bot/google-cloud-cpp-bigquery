@@ -17,11 +17,13 @@
 #include <sstream>
 #include <string>
 
-#include "bigquery/internal/bigquerystorage_stub.h"
-#include "bigquery/internal/connection_impl.h"
-#include "bigquery/version.h"
+#include "google/cloud/bigquery/internal/bigquerystorage_stub.h"
+#include "google/cloud/bigquery/internal/connection_impl.h"
+#include "google/cloud/bigquery/version.h"
 #include "google/cloud/status_or.h"
 
+namespace google {
+namespace cloud {
 namespace bigquery {
 inline namespace BIGQUERY_CLIENT_NS {
 namespace internal {
@@ -94,3 +96,5 @@ std::shared_ptr<ConnectionImpl> MakeConnection(
 }  // namespace internal
 }  // namespace BIGQUERY_CLIENT_NS
 }  // namespace bigquery
+}  // namespace cloud
+}  // namespace google

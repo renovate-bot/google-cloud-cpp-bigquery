@@ -15,10 +15,12 @@
 #ifndef BIGQUERY_INTERNAL_STREAMING_READER_H_
 #define BIGQUERY_INTERNAL_STREAMING_READER_H_
 
-#include "bigquery/version.h"
+#include "google/cloud/bigquery/version.h"
 #include "google/cloud/optional.h"
 #include "google/cloud/status_or.h"
 
+namespace google {
+namespace cloud {
 namespace bigquery {
 inline namespace BIGQUERY_CLIENT_NS {
 namespace internal {
@@ -46,5 +48,7 @@ class StreamReader {
 }  // namespace internal
 }  // namespace BIGQUERY_CLIENT_NS
 }  // namespace bigquery
+}  // namespace cloud
+}  // namespace google
 
 #endif  // BIGQUERY_INTERNAL_STREAMING_READER_H_

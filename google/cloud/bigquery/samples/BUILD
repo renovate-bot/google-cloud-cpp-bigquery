@@ -18,6 +18,6 @@ cc_binary(
     "read.cc",
   ],
   deps = [
-    "//bigquery:bigquery_client",
+    "//google/cloud/bigquery:bigquery_client",
   ],
 )

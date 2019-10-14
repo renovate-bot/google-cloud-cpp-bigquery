@@ -18,15 +18,17 @@
 
 #include <grpcpp/create_channel.h>
 
-#include "bigquery/connection.h"
-#include "bigquery/connection_options.h"
-#include "bigquery/internal/bigquerystorage_stub.h"
-#include "bigquery/internal/stream_reader.h"
-#include "bigquery/version.h"
+#include "google/cloud/bigquery/connection.h"
+#include "google/cloud/bigquery/connection_options.h"
+#include "google/cloud/bigquery/internal/bigquerystorage_stub.h"
+#include "google/cloud/bigquery/internal/stream_reader.h"
+#include "google/cloud/bigquery/version.h"
 #include "google/cloud/grpc_utils/grpc_error_delegate.h"
 #include "google/cloud/optional.h"
 #include "google/cloud/status_or.h"
 
+namespace google {
+namespace cloud {
 namespace bigquery {
 inline namespace BIGQUERY_CLIENT_NS {
 namespace internal {
@@ -153,3 +155,5 @@ std::shared_ptr<BigQueryStorageStub> MakeDefaultBigQueryStorageStub(
 }  // namespace internal
 }  // namespace BIGQUERY_CLIENT_NS
 }  // namespace bigquery
+}  // namespace cloud
+}  // namespace google
