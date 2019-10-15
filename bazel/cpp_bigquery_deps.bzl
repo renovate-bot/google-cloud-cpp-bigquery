@@ -40,11 +40,11 @@ def cpp_bigquery_deps():
     if "com_google_googletest" not in native.existing_rules():
         http_archive(
             name = "com_google_googletest",
-            strip_prefix = "googletest-b6cd405286ed8635ece71c72f118e659f4ade3fb",
+            strip_prefix = "googletest-ba513d2c9525a7c986c115ed5d603f2cf17c6016",
             urls = [
-                "https://github.com/google/googletest/archive/b6cd405286ed8635ece71c72f118e659f4ade3fb.tar.gz",
+                "https://github.com/google/googletest/archive/ba513d2c9525a7c986c115ed5d603f2cf17c6016.tar.gz",
             ],
-            sha256 = "8d9aa381a6885fe480b7d0ce8ef747a0b8c6ee92f99d74ab07e3503434007cb0",
+            sha256 = "15e558e199cc51b813d44c2e8c08e5c608828b8a40632a544dcc4baaa5fc8750",
         )
 
     # Load the googleapis dependency.
