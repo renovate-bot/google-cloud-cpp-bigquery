@@ -64,12 +64,12 @@ def cpp_bigquery_deps():
     if "com_github_grpc_grpc" not in native.existing_rules():
         http_archive(
             name = "com_github_grpc_grpc",
-            strip_prefix = "grpc-1.24.2",
+            strip_prefix = "grpc-1.22.0",
             urls = [
-                "https://github.com/grpc/grpc/archive/v1.24.2.tar.gz",
-                "https://mirror.bazel.build/github.com/grpc/grpc/archive/v1.24.2.tar.gz",
+                "https://github.com/grpc/grpc/archive/v1.22.0.tar.gz",
+                "https://mirror.bazel.build/github.com/grpc/grpc/archive/v1.22.0.tar.gz",
             ],
-            sha256 = "fd040f5238ff1e32b468d9d38e50f0d7f8da0828019948c9001e9a03093e1d8f",
+            sha256 = "11ac793c562143d52fd440f6549588712badc79211cdc8c509b183cb69bddad8",
         )
 
     # We use the cc_proto_library() rule from @com_google_protobuf, which
