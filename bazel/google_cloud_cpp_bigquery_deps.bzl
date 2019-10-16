@@ -14,8 +14,8 @@
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
-def cpp_bigquery_deps():
-    """Loads dependencies need to compile the cpp-bigquery library.
+def google_cloud_cpp_bigquery_deps():
+    """Loads dependencies need to compile the google-cloud-cpp-bigquery library.
 
     Application developers can call this function from their WORKSPACE
     file to obtain all the necessary dependencies for
@@ -56,7 +56,7 @@ def cpp_bigquery_deps():
             ],
             strip_prefix = "googleapis-304d00375de19c847a730bfd7f077e523a1abba9",
             sha256 = "83979885c1e5165ebef8a4abe948beb998b7c7e74654cae82cc4d8d02516c732",
-            build_file = "@com_github_aryann_cpp_bigquery//bazel:googleapis.BUILD",
+            build_file = "@com_github_googleapis_google_cloud_cpp_bigquery//bazel:googleapis.BUILD",
         )
 
     # Load gRPC and its dependencies, using a similar pattern to this function.

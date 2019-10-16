@@ -1,8 +1,8 @@
-workspace(name = "com_github_aryann_cpp_bigquery")
+workspace(name = "com_github_googleapis_google_cloud_cpp_bigquery")
 
-load("//bazel:cpp_bigquery_deps.bzl", "cpp_bigquery_deps")
+load("//bazel:google_cloud_cpp_bigquery_deps.bzl", "google_cloud_cpp_bigquery_deps")
 
-cpp_bigquery_deps()
+google_cloud_cpp_bigquery_deps()
 
 # Configure @com_google_googleapis to only compile C++ and gRPC libraries.
 load("@com_google_googleapis//:repository_rules.bzl", "switched_rules_by_language")
