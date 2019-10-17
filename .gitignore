@@ -15,3 +15,5 @@ cmake-build-*/
 
 # Ignore Visual Studio Code files.
 .vscode/
+
+cmake-out/
