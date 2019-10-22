@@ -83,6 +83,17 @@ def google_cloud_cpp_bigquery_deps():
             sha256 = "fd040f5238ff1e32b468d9d38e50f0d7f8da0828019948c9001e9a03093e1d8f",
         )
 
+    # Load rules_cc, used by googletest.
+    if "rules_cc" not in native.existing_rules():
+        http_archive(
+            name = "rules_cc",
+            strip_prefix = "rules_cc-a508235df92e71d537fcbae0c7c952ea6957a912",
+            urls = [
+                "https://github.com/bazelbuild/rules_cc/archive/a508235df92e71d537fcbae0c7c952ea6957a912.tar.gz",
+            ],
+            sha256 = "d21d38c4b8e81eed8fa95ede48dd69aba01a3b938be6ac03d2b9dc61886a7183",
+        )
+
     # We use the cc_proto_library() rule from @com_google_protobuf, which
     # assumes that grpc_cpp_plugin and grpc_lib are in the //external: module
     native.bind(
