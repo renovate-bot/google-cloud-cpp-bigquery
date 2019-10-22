@@ -1,0 +1,6 @@
+# The cmake-out/ directory contains many BUILD files that are downloaded from
+# the repositories of dependencies that also happen to use Bazel.
+#
+# This entry allows users to run "bazel build ..." without worrying about
+# anything in cmake-out/ being invoked.
+cmake-out
