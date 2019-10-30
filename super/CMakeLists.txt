@@ -23,6 +23,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(GOOGLE_CLOUD_CPP_BIGQUERY_ROOT "${PROJECT_SOURCE_DIR}/..")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 
+include(external/apache-arrow)
 include(external/google-cloud-cpp-common)
 include(external/googletest)
 include(external/external-project-helpers)
@@ -34,7 +35,7 @@ set_external_project_build_parallel_level(PARALLEL)
 include(ExternalProject)
 ExternalProject_Add(
     google-cloud-cpp-bigquery-as-external
-    DEPENDS google-cloud-cpp-common-project googletest-project
+    DEPENDS google-cloud-cpp-common-project googletest-project apache-arrow-project
     EXCLUDE_FROM_ALL OFF
     BUILD_ALWAYS 1
     PREFIX "${CMAKE_BINARY_DIR}/build/google-cloud-cpp-bigquery"
