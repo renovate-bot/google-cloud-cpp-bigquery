@@ -57,11 +57,12 @@ fi
 echo "================================================================"
 echo "Compiling all the code, including integration tests $(date)"
 echo "================================================================"
-# Then build everything else (integration tests, examples, etc). So we can run
-# them next.
-"${BAZEL_BIN}" build \
-    "${bazel_args[@]}" \
-    ...
+"${BAZEL_BIN}" build "${bazel_args[@]}" ...
+
+echo "================================================================"
+echo "Compiling and running unit tests $(date)"
+echo "================================================================"
+"${BAZEL_BIN}" test "${bazel_args[@]}" ...
 
 echo "================================================================"
 echo "Build finished at $(date)"
