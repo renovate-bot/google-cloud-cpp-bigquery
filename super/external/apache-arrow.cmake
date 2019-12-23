@@ -19,10 +19,32 @@ include(external/external-project-helpers)
 
 if (NOT TARGET apache-arrow-project)
     set(GOOGLE_CLOUD_CPP_APACHE_ARROW_URL
-        "https://www-us.apache.org/dist/arrow/arrow-0.15.0/apache-arrow-0.15.0.tar.gz"
+        "http://apache-mirror.8birdsvideo.com/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://apache.claz.org/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://apache.cs.utah.edu/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://apache.mirrors.hoobly.com/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://apache.mirrors.lucidnetworks.net/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://apache.mirrors.pair.com/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://apache.mirrors.tds.net/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://apache.osuosl.org/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://apache.spinellicreations.com/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://ftp.wayne.edu/apache/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://mirror.cc.columbia.edu/pub/software/apache/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://mirror.cogentco.com/pub/apache/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://mirror.metrocast.net/apache/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://mirror.olnevhost.net/pub/apache/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://mirror.reverse.net/pub/apache/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://mirrors.advancedhosters.com/apache/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://mirrors.gigenet.com/apache/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://mirrors.ibiblio.org/apache/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://mirrors.koehn.com/apache/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://mirrors.ocf.berkeley.edu/apache/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://mirrors.sonic.net/apache/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://us.mirrors.quenda.co/apache/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
+        "http://www.gtlib.gatech.edu/pub/apache/arrow/arrow-0.15.1/apache-arrow-0.15.1.tar.gz"
     )
     set(GOOGLE_CLOUD_CPP_APACHE_ARROW_SHA256
-        "d1072d8c4bf9166949f4b722a89350a88b7c8912f51642a5d52283448acdfd58")
+        "9a2c58c72310eafebb4997244cbeeb8c26696320d0ae3eb3e8512f75ef856fc9")
 
     google_cloud_cpp_set_prefix_vars()
 
