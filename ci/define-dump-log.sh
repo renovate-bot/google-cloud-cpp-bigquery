@@ -28,14 +28,14 @@ dump_log() {
   shift
   local -r base="$(basename "${logfile}")"
 
-  if [ ! -r "${logfile}" ]; then
+  if [[ ! -r "${logfile}" ]]; then
     return
   fi
 
   echo "================ [begin ${base}] ================"
   # Travis has a limit of ~10,000 lines, if the file is around 1,000 just print
   # the full file.
-  if [ "$(wc -l "${logfile}" | awk '{print $1}')" -lt 200 ]; then
+  if [[ "$(wc -l "${logfile}" | awk '{print $1}')" -lt 200 ]]; then
     cat "${logfile}"
   else
     head -100 "${logfile}"

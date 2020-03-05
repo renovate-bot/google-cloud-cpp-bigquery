@@ -19,14 +19,15 @@ set -o nounset
 
 export CC=gcc
 export CXX=g++
-export DISTRO=ubuntu-install
+export DISTRO=ubuntu
 export DISTRO_VERSION=18.04
+export BAZEL_CONFIG=""
 export CMAKE_SOURCE_DIR="."
 
-if [[ $# -eq 1 ]]; then
+in_docker_script="ci/kokoro/docker/build-in-docker-bazel.sh"
+
+if [[ $# -ge 1 ]]; then
   export BUILD_NAME="${1}"
-elif [[ -n "${BUILD_NAME:-}" ]]; then
-  echo "Using BUILD_NAME=${BUILD_NAME} from environment."
 elif [[ -n "${KOKORO_JOB_NAME:-}" ]]; then
   # Kokoro injects the KOKORO_JOB_NAME environment variable, the value of this
   # variable is cloud-cpp/bigquery/<config-file-name-without-cfg> (or more
@@ -53,14 +54,139 @@ else
   exit 1
 fi
 
-if [[ "${BUILD_NAME}" = "asan" ]]; then
-  # Compile with the AddressSanitizer enabled.
+# If RUN_INTEGRATION_TESTS is set in the environment, always use that value.
+# Otherwise, it's up to individual tests whether to leave RUN_INTEGRATION_TESTS
+# empty or set it to DEFAULT_RUN_INTEGRATION_TESTS.
+#
+# Default to "yes" for kokoro builds and "auto" otherwise (the former fails if
+# no configuration/credentials are available while the latter skips the tests).
+DEFAULT_RUN_INTEGRATION_TESTS="auto"
+if [[ -n "${KOKORO_JOB_NAME:-}" ]]; then
+  DEFAULT_RUN_INTEGRATION_TESTS="yes"
+fi
+export RUN_INTEGRATION_TESTS
+
+if [[ "${BUILD_NAME}" = "clang-tidy" ]]; then
+  # Compile with clang-tidy(1) turned on. The build treats clang-tidy warnings
+  # as errors.
+  export DISTRO=fedora-install
+  export DISTRO_VERSION=30
   export CC=clang
   export CXX=clang++
+  export BUILD_TYPE=Debug
+  export CHECK_STYLE=yes
+  export GENERATE_DOCS=yes
+  export CLANG_TIDY=yes
+  export TEST_INSTALL=yes
+  in_docker_script="ci/kokoro/docker/build-in-docker-cmake.sh"
+elif [[ "${BUILD_NAME}" = "publish-refdocs" ]]; then
+  export DISTRO=fedora-install
+  export DISTRO_VERSION=30
+  export CC=clang
+  export CXX=clang++
+  export BUILD_TYPE=Debug
+  export GENERATE_DOCS=yes
+  export RUN_INTEGRATION_TESTS=no
+  in_docker_script="ci/kokoro/docker/build-in-docker-cmake.sh"
+elif [[ "${BUILD_NAME}" = "integration" ]]; then
+  export CC=gcc
+  export CXX=g++
+  # Integration tests were explicitly requested; use "yes" as the default.
+  : "${RUN_INTEGRATION_TESTS:=yes}"
+elif [[ "${BUILD_NAME}" = "asan" ]]; then
+  export BAZEL_CONFIG=asan
+  export CC=clang
+  export CXX=clang++
+  : "${RUN_INTEGRATION_TESTS:=$DEFAULT_RUN_INTEGRATION_TESTS}"
+elif [[ "${BUILD_NAME}" = "ubsan" ]]; then
+  export BAZEL_CONFIG=ubsan
+  export CC=clang
+  export CXX=clang++
+  : "${RUN_INTEGRATION_TESTS:=$DEFAULT_RUN_INTEGRATION_TESTS}"
+elif [[ "${BUILD_NAME}" = "tsan" ]]; then
+  export BAZEL_CONFIG=tsan
+  export CC=clang
+  export CXX=clang++
+  : "${RUN_INTEGRATION_TESTS:=$DEFAULT_RUN_INTEGRATION_TESTS}"
+elif [[ "${BUILD_NAME}" = "noex" ]]; then
+  export DISTRO=fedora-install
+  export DISTRO_VERSION=30
+  export CMAKE_FLAGS="-DGOOGLE_CLOUD_CPP_SPANNER_ENABLE_CXX_EXCEPTIONS=no"
+  in_docker_script="ci/kokoro/docker/build-in-docker-cmake.sh"
+elif [[ "${BUILD_NAME}" = "msan" ]]; then
+  # We use Fedora for this build because (1) I was able to find instructions on
+  # how to build libc++ with msan for that distribution, (2) Fedora has a
+  # relatively recent version of Clang (8.0 as I write this).
+  export DISTRO=fedora-libcxx-msan
+  export DISTRO_VERSION=30
+  export BAZEL_CONFIG=msan
+  export CC=clang
+  export CXX=clang++
+  : "${RUN_INTEGRATION_TESTS:=$DEFAULT_RUN_INTEGRATION_TESTS}"
+elif [[ "${BUILD_NAME}" = "cmake" ]]; then
+  export DISTRO=fedora-install
+  export DISTRO_VERSION=30
+  in_docker_script="ci/kokoro/docker/build-in-docker-cmake.sh"
+elif [[ "${BUILD_NAME}" = "cmake-super" ]]; then
+  export CMAKE_SOURCE_DIR="super"
+  export BUILD_TYPE=Release
+  export CMAKE_FLAGS=-DBUILD_SHARED_LIBS=yes
+  in_docker_script="ci/kokoro/docker/build-in-docker-cmake.sh"
+elif [[ "${BUILD_NAME}" = "ninja" ]]; then
+  # Compiling with Ninja can catch bugs that may not be caught using Make.
+  export USE_NINJA=yes
+  export CMAKE_SOURCE_DIR="super"
+  export CMAKE_FLAGS=-DBUILD_SHARED_LIBS=yes
+  in_docker_script="ci/kokoro/docker/build-in-docker-cmake.sh"
+elif [[ "${BUILD_NAME}" = "gcc-4.8" ]]; then
+  # The oldest version of GCC we support is 4.8, this build checks the code
+  # against that version. The use of CentOS 7 for that build is not a
+  # coincidence: the reason we support GCC 4.8 is to support this distribution
+  # (and its commercial cousin: RHEL 7).
+  export DISTRO=centos
+  export DISTRO_VERSION=7
+  export CMAKE_SOURCE_DIR="super"
+  in_docker_script="ci/kokoro/docker/build-in-docker-cmake.sh"
+elif [[ "${BUILD_NAME}" = "clang-3.8" ]]; then
+  # The oldest version of Clang we actively test is 3.8. There is nothing
+  # particularly interesting about that version. It is simply the version
+  # included with Ubuntu:16.04, and the oldest version tested by
+  # google-cloud-cpp.
+  export DISTRO=ubuntu
+  export DISTRO_VERSION=16.04
+  export CC=clang
+  export CXX=clang++
+  export CMAKE_SOURCE_DIR="super"
+  in_docker_script="ci/kokoro/docker/build-in-docker-cmake.sh"
+elif [[ "${BUILD_NAME}" = "cxx17" ]]; then
+  export GOOGLE_CLOUD_CPP_CXX_STANDARD=17
+  export DISTRO=fedora-install
+  export DISTRO_VERSION=30
+  export CC=gcc
+  export CXX=g++
+  in_docker_script="ci/kokoro/docker/build-in-docker-cmake.sh"
+elif [[ "${BUILD_NAME}" = "coverage" ]]; then
+  export BUILD_TYPE=Coverage
+  export DISTRO=fedora-install
+  export DISTRO_VERSION=30
+  : "${RUN_INTEGRATION_TESTS:=$DEFAULT_RUN_INTEGRATION_TESTS}"
+  export RUN_SLOW_INTEGRATION_TESTS=yes
+  in_docker_script="ci/kokoro/docker/build-in-docker-cmake.sh"
+elif [[ "${BUILD_NAME}" = "bazel-dependency" ]]; then
   export DISTRO=ubuntu
   export DISTRO_VERSION=18.04
-  export BAZEL_CONFIG="asan"
-  in_docker_script="ci/kokoro/docker/build-in-docker-bazel.sh"
+  in_docker_script="ci/kokoro/docker/build-in-docker-bazel-dependency.sh"
+elif [[ "${BUILD_NAME}" = "check-api" ]] || [[ "${BUILD_NAME}" = "update-api" ]]; then
+  export DISTRO=fedora-install
+  export DISTRO_VERSION=30
+  export CHECK_API=yes
+  export TEST_INSTALL=yes
+  export CMAKE_FLAGS=-DBUILD_SHARED_LIBS=yes
+  export BUILD_TYPE=Debug
+  if [[ "${BUILD_NAME}" = "update-api" ]]; then
+    export UPDATE_API=yes
+  fi
+  in_docker_script="ci/kokoro/docker/build-in-docker-cmake.sh"
 else
   echo "Unknown BUILD_NAME (${BUILD_NAME}). Fix the Kokoro .cfg file."
   exit 1
@@ -69,10 +195,15 @@ fi
 if [[ -z "${PROJECT_ROOT+x}" ]]; then
   readonly PROJECT_ROOT="$(cd "$(dirname "$0")/../../.."; pwd)"
 fi
+source "${PROJECT_ROOT}/ci/define-dump-log.sh"
+source "${PROJECT_ROOT}/ci/etc/kokoro/install/version-config.sh"
+export GOOGLE_CLOUD_CPP_COMMON_VERSION
 
 echo "================================================================"
-echo "Change working directory to project root $(date)."
+NCPU=$(nproc)
+export NCPU
 cd "${PROJECT_ROOT}"
+echo "Building with ${NCPU} cores $(date) on ${PWD}."
 
 echo "================================================================"
 echo "Capture Docker version to troubleshoot $(date)."
@@ -84,12 +215,8 @@ echo "Load Google Container Registry configuration parameters $(date)."
 if [[ -f "${KOKORO_GFILE_DIR:-}/gcr-configuration.sh" ]]; then
   source "${KOKORO_GFILE_DIR:-}/gcr-configuration.sh"
 fi
-
 source "${PROJECT_ROOT}/ci/kokoro/docker/define-docker-variables.sh"
-source "${PROJECT_ROOT}/ci/define-dump-log.sh"
 
-echo "================================================================"
-echo "Building with ${NCPU} cores $(date) on ${PWD}."
 echo "================================================================"
 echo "Setup Google Container Registry access $(date)."
 if [[ -f "${KOKORO_GFILE_DIR:-}/gcr-service-account.json" ]]; then
@@ -132,6 +259,7 @@ fi
 
 echo "================================================================"
 echo "Creating Docker image with all the development tools $(date)."
+echo "    docker build ${docker_build_flags[*]} ci"
 echo "Logging to ${BUILD_OUTPUT}/create-build-docker-image.log"
 # We do not want to print the log unless there is an error, so disable the -e
 # flag. Later, we will want to print out the emulator(s) logs *only* if there
@@ -140,9 +268,10 @@ set +e
 mkdir -p "${BUILD_OUTPUT}"
 if timeout 3600s docker build "${docker_build_flags[@]}" ci \
     >"${BUILD_OUTPUT}/create-build-docker-image.log" 2>&1 </dev/null; then
-   update_cache="true"
-fi
-if [[ "$?" != 0 ]]; then
+  update_cache="true"
+  echo "Docker image successfully rebuilt"
+else
+  echo "Error updating Docker image, using cached image for this build"
   dump_log "${BUILD_OUTPUT}/create-build-docker-image.log"
 fi
 
@@ -154,30 +283,6 @@ if "${update_cache}" && [[ "${RUNNING_CI:-}" == "yes" ]] &&
   docker push "${IMAGE}:latest" || true
 fi
 
-# Because Kokoro checks out the code in `detached HEAD` mode there is no easy
-# way to discover what is the current branch (and Kokoro does not expose the
-# branch as an enviroment variable, like other CI systems do). We use the
-# following trick:
-# - Find out the current commit using git rev-parse HEAD.
-# - Exclude "HEAD detached" branches (they are not really branches).
-# - Choose the branch from the bottom of the list.
-# - Typically this is the branch that was checked out by Kokoro.
-echo "================================================================"
-echo "Detecting the branch name $(date)."
-BRANCH="$(git branch --all --no-color --contains "$(git rev-parse HEAD)" | \
-  grep -v 'HEAD' | tail -1 || exit 0)"
-# Enable extglob if not enabled
-shopt -q extglob || shopt -s extglob
-BRANCH="${BRANCH##*( )}"
-BRANCH="${BRANCH%%*( )}"
-BRANCH="${BRANCH##remotes/origin/}"
-BRANCH="${BRANCH##remotes/upstream/}"
-export BRANCH
-echo "================================================================"
-echo "Detected the branch name: ${BRANCH} $(date)."
-
-echo "================================================================"
-echo "Running the full build inside docker $(date)."
 # The default user for a Docker container has uid 0 (root). To avoid creating
 # root-owned files in the build directory we tell docker to use the current
 # user ID, if known.
@@ -185,19 +290,21 @@ docker_uid="${UID:-0}"
 docker_user="${USER:-root}"
 docker_home_prefix="${PWD}/cmake-out/home"
 if [[ "${docker_uid}" == "0" ]]; then
-  # If the UID is 0, then the HOME directory will be set to /root, and we
-  # need to mount the ccache files is /root/.ccache.
   docker_home_prefix="${PWD}/cmake-out/root"
 fi
 
+# Make sure the user has a $HOME directory inside the Docker container.
 mkdir -p "${BUILD_HOME}"
 
 # We use an array for the flags so they are easier to document.
 docker_flags=(
-    # Enable ptrace as it is needed by s
+    # Grant the PTRACE capability to the Docker container running the build,
+    # this is needed by tools like AddressSanitizer.
     "--cap-add" "SYS_PTRACE"
 
-    # The name and version of the, this is used to call linux-config.sh
+    # The name and version of the distribution, this is used to call
+    # define-docker-variables.sh and determine the Docker image built, and the
+    # output directory for any artifacts.
     "--env" "DISTRO=${DISTRO}"
     "--env" "DISTRO_VERSION=${DISTRO_VERSION}"
 
@@ -206,74 +313,76 @@ docker_flags=(
     "--env" "CXX=${CXX}"
     "--env" "CC=${CC}"
 
-    "--env" "NCPU=${NCPU}"
+    # The number of CPUs, probably should be removed, the scripts can detect
+    # this themselves in Kokoro (it was a problem on Travis).
+    "--env" "NCPU=${NCPU:-4}"
 
-    # Pass down the BUILD_NAME.
-    "--env" "BUILD_NAME=${BUILD_NAME}"
-    "--env" "BRANCH=${BRANCH}"
-
-    # Disable ccache(1) for Kokoro builds.
-    "--env" "NEEDS_CCACHE=no"
-
-    # If set, pass -DGOOGLE_CLOUD_CPP_CXX_STANDARD=<value> to CMake.
-    "--env" "GOOGLE_CLOUD_CPP_CXX_STANDARD=${GOOGLE_CLOUD_CPP_CXX_STANDARD:-}"
-
-    # The type of the build for CMake.
-    "--env" "BUILD_TYPE=${BUILD_TYPE:-Release}"
-    # Additional flags to enable CMake features.
-    "--env" "CMAKE_FLAGS=${CMAKE_FLAGS:-}"
-
-    # The type of the build for Bazel.
-    "--env" "BAZEL_CONFIG=${BAZEL_CONFIG:-}"
-
-    # With CMake we can disable the tests, this is useful for package
-    # maintainers and we need to test it.
-    "--env" "BUILD_TESTING=${BUILD_TESTING:=yes}"
-
-    # If set, enable using libc++ with CMake.
-    "--env" "USE_LIBCXX=${USE_LIBCXX:-}"
-
-    # If set, enable the Ninja generator with CMake.
-    "--env" "USE_NINJA=${USE_NINJA:-}"
-
-    # If set, use Clang's static analyzer. Currently there is no build that
-    # uses this feature, it may have rotten.
-    "--env" "SCAN_BUILD=${SCAN_BUILD:-}"
-
-    # If set, run the check-abi.sh script.
-    "--env" "CHECK_ABI=${CHECK_ABI:-}"
-
-    # If set, run the check-abi.sh script and *then* update the API/ABI
-    # baseline.
-    "--env" "UPDATE_ABI=${UPDATE_ABI:-}"
-
-    # If set, run the scripts to check (and fix) the code formatting (i.e.
-    # clang-format, cmake-format, and buildifier).
+    # If set to 'yes', the build script will run the style checks, including
+    # clang-format, cmake-format, and buildifier.
     "--env" "CHECK_STYLE=${CHECK_STYLE:-}"
 
-    # If set to 'no', skip the integration tests.
+    # If set to 'yes', the build script will configure clang-tidy. Currently
+    # only the CMake builds use this flag.
+    "--env" "CLANG_TIDY=${CLANG_TIDY:-}"
+
+    # Whether to run the integration tests. 'yes' always runs the tests, 'auto'
+    # only runs the test if credentials are configured, 'no' (or any other
+    # value) does not run them.
     "--env" "RUN_INTEGRATION_TESTS=${RUN_INTEGRATION_TESTS:-}"
 
-    # If set, run the scripts to generate Doxygen docs. Note that the scripts
-    # to upload said docs are not part of the build, they run afterwards on
-    # Travis.
+    # Whether to run integration tests which are too slow, or too problematic on
+    # the ci builds. If the value is "yes", runs the tests, if the value is
+    # "no" (or any other value) does not run them.
+    "--env" "RUN_SLOW_INTEGRATION_TESTS=${RUN_SLOW_INTEGRATION_TESTS:-}"
+
+    # If set to 'yes', run Doxygen to generate the documents and detect simple
+    # errors in the documentation (e.g. partially documented parameter lists,
+    # invalid links to functions or types). Currently only the CMake builds use
+    # this flag.
     "--env" "GENERATE_DOCS=${GENERATE_DOCS:-}"
+
+    # Pass down the g-c-c-common's version for Doxygen cross linking.
+    "--env"
+    "GOOGLE_CLOUD_CPP_COMMON_VERSION=${GOOGLE_CLOUD_CPP_COMMON_VERSION:-}"
 
     # If set, execute tests to verify `make install` works and produces working
     # installations.
     "--env" "TEST_INSTALL=${TEST_INSTALL:-}"
 
-    # Configure the location of the Cloud Bigtable command-line tool and
-    # emulator.
-    "--env" "CBT=/usr/local/google-cloud-sdk/bin/cbt"
-    "--env" "CBT_EMULATOR=/usr/local/google-cloud-sdk/platform/bigtable-emulator/cbtemulator"
+    # If set, pass -DGOOGLE_CLOUD_CPP_CXX_STANDARD=<value> to CMake.
+    "--env" "GOOGLE_CLOUD_CPP_CXX_STANDARD=${GOOGLE_CLOUD_CPP_CXX_STANDARD:-}"
+
+    # The type of the build for CMake
+    "--env" "BUILD_TYPE=${BUILD_TYPE:-Release}"
+
+    # Additional flags to enable CMake features.
+    "--env" "CMAKE_FLAGS=${CMAKE_FLAGS:-}"
+
+    # If set, enable the Ninja generator with CMake.
+    "--env" "USE_NINJA=${USE_NINJA:-}"
+
+    # If set, run the check-api.sh script.
+    "--env" "CHECK_API=${CHECK_API:-}"
+
+    # If set, run the check-api.sh script and *then* update the API
+    # baseline.
+    "--env" "UPDATE_API=${UPDATE_API:-}"
+
+    # Tells scripts whether they are running as part of a CI or not.
+    "--env" "RUNNING_CI=${RUNNING_CI:-no}"
+
+    # When running the integration tests this directory contains the
+    # configuration files needed to run said tests. Make it available inside
+    # the Docker container.
+    "--volume" "${KOKORO_GFILE_DIR:-/dev/shm}:/c"
+
+    # The argument for the --config option in Bazel, this is how we tell Bazel
+    # to build with ASAN, UBSAN, TSAN, etc.
+    "--env" "BAZEL_CONFIG=${BAZEL_CONFIG:-}"
 
     # Let the Docker image script know what kind of terminal we are using, that
     # produces properly colorized error messages.
     "--env" "TERM=${TERM:-dumb}"
-
-    # Tells scripts whether they are running as part of a CI or not.
-    "--env" "RUNNING_CI=${RUNNING_CI:-no}"
 
     # Run the docker script and this user id. Because the docker image gets to
     # write in ${PWD} you typically want this to be your user id.
@@ -285,14 +394,12 @@ docker_flags=(
     # We give Bazel and CMake a fake $HOME inside the docker image. Bazel caches
     # build byproducts in this directory. CMake (when ccache is enabled) uses
     # it to store $HOME/.ccache
-
-    # Make the fake directory available inside the docker image as `/h`.
-    "--volume" "${PWD}/${BUILD_HOME}:/h"
     "--env" "HOME=/h"
+    "--volume" "${PWD}/${BUILD_HOME}:/h"
 
     # Mount the current directory (which is the top-level directory for the
     # project) as `/v` inside the docker image, and move to that directory.
-    "--volume" "${PWD}:/v"
+    "--volume" "${PWD}:/v:Z"
     "--workdir" "/v"
 
     # Mask any other builds that may exist at the same time. That is, these
@@ -303,44 +410,110 @@ docker_flags=(
     # in your workstation.
     "--volume" "/v/cmake-out/home"
     "--volume" "/v/cmake-out"
-    "--volume" "/v/cmake-build-debug"
     "--volume" "${PWD}/${BUILD_OUTPUT}:/v/${BUILD_OUTPUT}"
+
+    # No need to preserve the container.
+    "--rm"
 )
 
-# When running on Travis the build gets a tty, and docker can produce nicer
-# output in that case, but on Kokoro the script does not get a tty, and Docker
-# terminates the program if we pass the `-it` flag in that case.
+# When running the builds from the command-line they get a tty, and the scripts
+# running inside the Docker container can produce nicer output. On Kokoro the
+# script does not get a tty, and Docker terminates the program if we pass the
+# `-it` flag.
 if [[ -t 0 ]]; then
   docker_flags+=("-it")
 fi
 
-# Run the docker image with that giant collection of flags.
-sudo docker run "${docker_flags[@]}" "${IMAGE}:latest" \
-    "/v/${in_docker_script}" "${CMAKE_SOURCE_DIR}" "${BUILD_OUTPUT}"
+# If more than two arguments are given, arguments after the first one will
+# become the commands run in the container, otherwise run $in_docker_script with
+# appropriate arguments.
+echo "================================================================"
+if [[ $# -ge 2 ]]; then
+  echo "Running the given commands '" "${@:2}" "' in the container $(date)."
+  readonly commands=( "${@:2}" )
+else
+  echo "Running the full build $(date)."
+  readonly commands=(
+    "/v/${in_docker_script}"
+    "${CMAKE_SOURCE_DIR}"
+    "${BUILD_OUTPUT}"
+  )
+fi
+
+sudo docker run "${docker_flags[@]}" "${IMAGE}:latest" "${commands[@]}"
+
 exit_status=$?
 echo "Build finished with ${exit_status} exit status $(date)."
 echo "================================================================"
 
 if [[ "${BUILD_NAME}" == "publish-refdocs" ]]; then
   "${PROJECT_ROOT}/ci/kokoro/docker/publish-refdocs.sh"
-  exit_status=$?
+  [[ ${exit_status} -eq 0 ]] && exit_status=$?
 else
   "${PROJECT_ROOT}/ci/kokoro/docker/upload-docs.sh"
 fi
 
-"${PROJECT_ROOT}/ci/kokoro/docker/upload-coverage.sh" "${IMAGE}:latest" "${docker_flags[@]}"
+if [[ "${BUILD_NAME:-}" != "coverage" ]] || \
+   [[ -z "${KOKORO_GFILE_DIR:-}" ]] || \
+   ! [[ -r "${KOKORO_GFILE_DIR:-}/codecov-io-upload-token" ]]; then
+  echo "Coverage upload not applicable or not configured"
+else
+  CODECOV_TOKEN="$(cat "${KOKORO_GFILE_DIR}/codecov-io-upload-token")"
+  readonly CODECOV_TOKEN
 
-if [[ "${exit_status}" != 0 ]]; then
-  echo "================================================================"
-  echo "Build failed printing logs at $(date)."
-  "${PROJECT_ROOT}/ci/kokoro/docker/dump-logs.sh"
+  # Because Kokoro checks out the code in `detached HEAD` mode there is no easy
+  # way to discover what is the current branch (and Kokoro does not expose the
+  # branch as an environment variable, like other CI systems do). We use the
+  # following trick:
+  # - Find out the current commit using git rev-parse HEAD.
+  # - Find out what branches contain that commit.
+  # - Exclude "HEAD detached" branches (they are not really branches).
+  # - Typically this is the single branch that was checked out by Kokoro.
+  VCS_BRANCH_NAME="$(git branch --no-color --contains "$(git rev-parse HEAD)" | \
+      grep -v 'HEAD detached' || exit 0)"
+  VCS_BRANCH_NAME="${VCS_BRANCH_NAME/  /}"
+  # When running locally, in a checked out branch, we need more cleanup.
+  VCS_BRANCH_NAME="${VCS_BRANCH_NAME/* /}"
+  readonly VCS_BRANCH_NAME
+
+  if [[ -n "${KOKORO_GITHUB_PULL_REQUEST_COMMIT:-}" ]]; then
+    readonly VCS_COMMIT_ID="${KOKORO_GITHUB_PULL_REQUEST_COMMIT}"
+  elif [[ -n "${KOKORO_GIT_COMMIT:-}" ]]; then
+    readonly VCS_COMMIT_ID="${KOKORO_GIT_COMMIT}"
+  else
+    readonly VCS_COMMIT_ID="$(git rev-parse HEAD)"
+  fi
+
+  docker_flags+=(
+      # The upload token for codecov.io
+      "--env" "CODECOV_TOKEN=${CODECOV_TOKEN}"
+
+      # Assert to the build
+      "--env" "CI=true"
+
+      # Let codecov.io know if this is a pull request and what is the PR number.
+      "--env" "VCS_PULL_REQUEST=${KOKORO_GITHUB_PULL_REQUEST_NUMBER:-}"
+
+      # Basic information about the commit.
+      "--env" "VCS_COMMIT_ID=${VCS_COMMIT_ID}"
+      "--env" "VCS_BRANCH_NAME=${VCS_BRANCH_NAME}"
+
+      # Let codecov.io know about which build ID this is.
+      "--env" "CI_BUILD_ID=${KOKORO_BUILD_NUMBER:-}"
+      "--env" "CI_JOB_ID=${KOKORO_BUILD_NUMBER:-}"
+  )
+
+  echo -n "Uploading code coverage to codecov.io..."
+  # Run the upload script from codecov.io within a Docker container. Save the log
+  # to a file because it can be very large (multiple MiB in size).
+  sudo docker run "${docker_flags[@]}" "${IMAGE}:latest" /bin/bash -c \
+      "/bin/bash <(curl -s https://codecov.io/bash) >/v/${BUILD_OUTPUT}/codecov.log 2>&1"
+  [[ ${exit_status} -eq 0 ]] && exit_status=$?
+  echo "DONE"
 fi
 
 echo "================================================================"
 "${PROJECT_ROOT}/ci/kokoro/docker/dump-reports.sh"
 echo "================================================================"
 
-echo
-echo "Build script finished with ${exit_status} exit status $(date)."
-echo
 exit ${exit_status}

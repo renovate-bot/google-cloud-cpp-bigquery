@@ -17,10 +17,16 @@
 set -o errexit
 set -o nounset
 
+if [[ -z "${PROJECT_ROOT+x}" ]]; then
+  PROJECT_ROOT="$(cd "$(dirname "$0")/.."; pwd)"
+  readonly PROJECT_ROOT
+fi
+source "${PROJECT_ROOT}/ci/etc/install-config.sh"
+
 readonly PLATFORM=$(printf "%s-%s" "$(uname -s)" "$(uname -m)" \
   |  tr '[:upper:]' '[:lower:]')
 
-readonly BAZEL_VERSION="0.29.1"
+readonly BAZEL_VERSION="${GOOGLE_CLOUD_CPP_BAZEL_VERSION}"
 readonly GITHUB_DL="https://github.com/bazelbuild/bazel/releases/download"
 readonly SCRIPT_NAME="bazel-${BAZEL_VERSION}-installer-${PLATFORM}.sh"
 wget -q "${GITHUB_DL}/${BAZEL_VERSION}/${SCRIPT_NAME}"
@@ -37,3 +43,5 @@ if [[ "${USER:-}" = "root" ]] || [[ "${USER+x}" = "" ]]; then
 else
   "./${SCRIPT_NAME}" --user
 fi
+
+rm -f "${SCRIPT_NAME}" "${SCRIPT_NAME}.sha256"
