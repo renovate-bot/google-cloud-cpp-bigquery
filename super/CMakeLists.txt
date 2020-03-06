@@ -37,17 +37,14 @@ ExternalProject_Add(
     google-cloud-cpp-bigquery-as-external
     DEPENDS google-cloud-cpp-common-project googletest-project
             apache-arrow-project
-    EXCLUDE_FROM_ALL
-        OFF
-        BUILD_ALWAYS
-        1
+    EXCLUDE_FROM_ALL OFF
+    BUILD_ALWAYS 1
     PREFIX "${CMAKE_BINARY_DIR}/build/google-cloud-cpp-bigquery"
     INSTALL_DIR
         "${GOOGLE_CLOUD_CPP_EXTERNAL_PREFIX}"
         SOURCE_DIR
         "${GOOGLE_CLOUD_CPP_BIGQUERY_ROOT}"
-        LIST_SEPARATOR
-        |
+    LIST_SEPARATOR |
     CMAKE_ARGS -G${CMAKE_GENERATOR}
                -DCMAKE_PREFIX_PATH=${GOOGLE_CLOUD_CPP_PREFIX_PATH}
                -DCMAKE_INSTALL_RPATH=${GOOGLE_CLOUD_CPP_INSTALL_RPATH}
