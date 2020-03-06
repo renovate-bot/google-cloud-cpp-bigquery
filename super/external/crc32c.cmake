@@ -36,7 +36,8 @@ if (NOT TARGET crc32c-project)
         INSTALL_DIR "${GOOGLE_CLOUD_CPP_EXTERNAL_PREFIX}"
         URL ${GOOGLE_CLOUD_CPP_CRC32C_URL}
         URL_HASH SHA256=${GOOGLE_CLOUD_CPP_CRC32C_SHA256}
-        LIST_SEPARATOR |
+                 LIST_SEPARATOR
+                 |
         CMAKE_ARGS -G${CMAKE_GENERATOR}
                    -DCRC32C_BUILD_TESTS=OFF
                    -DCRC32C_BUILD_BENCHMARKS=OFF
@@ -44,10 +45,7 @@ if (NOT TARGET crc32c-project)
                    -DCMAKE_INSTALL_PATH=${GOOGLE_CLOUD_CPP_INSTALL_PATH}
                    -DCMAKE_INSTALL_RPATH=${GOOGLE_CLOUD_CPP_INSTALL_RPATH}
                    -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-        BUILD_COMMAND ${CMAKE_COMMAND}
-                      --build
-                      <BINARY_DIR>
-                      ${PARALLEL}
+        BUILD_COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR> ${PARALLEL}
         LOG_DOWNLOAD ON
         LOG_CONFIGURE ON
         LOG_BUILD ON

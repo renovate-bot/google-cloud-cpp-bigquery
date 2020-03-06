@@ -40,7 +40,8 @@ if (NOT TARGET grpc-project)
         INSTALL_DIR "${GOOGLE_CLOUD_CPP_EXTERNAL_PREFIX}"
         URL ${GOOGLE_CLOUD_CPP_GRPC_URL}
         URL_HASH SHA256=${GOOGLE_CLOUD_CPP_GRPC_SHA256}
-        LIST_SEPARATOR |
+                 LIST_SEPARATOR
+                 |
         CMAKE_ARGS -G${CMAKE_GENERATOR}
                    -DgRPC_BUILD_TESTS=OFF
                    -DgRPC_ZLIB_PROVIDER=package
@@ -50,10 +51,7 @@ if (NOT TARGET grpc-project)
                    -DCMAKE_PREFIX_PATH=${GOOGLE_CLOUD_CPP_PREFIX_PATH}
                    -DCMAKE_INSTALL_RPATH=${GOOGLE_CLOUD_CPP_INSTALL_RPATH}
                    -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-        BUILD_COMMAND ${CMAKE_COMMAND}
-                      --build
-                      <BINARY_DIR>
-                      ${PARALLEL}
+        BUILD_COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR> ${PARALLEL}
         LOG_DOWNLOAD ON
         LOG_CONFIGURE ON
         LOG_BUILD ON

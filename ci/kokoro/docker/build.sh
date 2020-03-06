@@ -70,7 +70,7 @@ if [[ "${BUILD_NAME}" = "clang-tidy" ]]; then
   # Compile with clang-tidy(1) turned on. The build treats clang-tidy warnings
   # as errors.
   export DISTRO=fedora-install
-  export DISTRO_VERSION=30
+  export DISTRO_VERSION=31
   export CC=clang
   export CXX=clang++
   export BUILD_TYPE=Debug
@@ -360,6 +360,10 @@ docker_flags=(
 
     # If set, enable the Ninja generator with CMake.
     "--env" "USE_NINJA=${USE_NINJA:-}"
+
+    # If set, use Clang's static analyzer. Currently there is no build that
+    # uses this feature, it may have rotten.
+    "--env" "SCAN_BUILD=${SCAN_BUILD:-}"
 
     # If set, run the check-api.sh script.
     "--env" "CHECK_API=${CHECK_API:-}"
