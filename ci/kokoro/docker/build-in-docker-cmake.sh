@@ -182,12 +182,6 @@ if [[ "${TEST_INSTALL:-}" = "yes" ]]; then
       echo "${COLOR_RESET}"
       /bin/false
    fi
-
-  # Checking the ABI requires installation, so this is the first opportunity to
-  # run the check.
-  env -C "${PROJECT_ROOT}" \
-    PKG_CONFIG_PATH=/var/tmp/staging/lib/pkgconfig \
-    ./ci/kokoro/docker/check-api.sh "${BINARY_DIR}"
 fi
 
 # If document generation is enabled, run it now.
